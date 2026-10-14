@@ -10,8 +10,8 @@ struct comanda {
 };
 
 int main() {
-file* diarios[7];
-file* semanal;
+FILE* diarios[7];
+FILE* semanal;
 
 comanda actual[7];
 bool disponible[7];
