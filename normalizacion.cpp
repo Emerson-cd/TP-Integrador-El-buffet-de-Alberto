@@ -84,15 +84,68 @@ Nodo* agregarAlFinal(Nodo* inicio, Mozo mozo) {
     return inicio;
 }
 
+
+ 
 int main() {
     FILE* archivoHistorico = fopen("comandas_historicas.dat", "rb");
     if (archivoHistorico == NULL) {
         printf("Error: no se pudo abrir comandas_historicas.dat.\n");
         return 1;
     }
-
+ 
     Nodo* listaMozos = NULL;
     int cantidadMozos = 0;
-
-  
+ 
+    // Una sola pasada: por cada venta, busco al mozo; si no esta, lo creo.
+    ComandaHistorica historica;
+    while (fread(&historica, sizeof(ComandaHistorica), 1, archivoHistorico) == 1) {
+        Nodo* nodoMozo = buscarMozoPorNombre(listaMozos, historica.nombreMozo);
+ 
+        if (nodoMozo == NULL) {
+            Mozo nuevo;
+            cantidadMozos++;
+            nuevo.idMozo = cantidadMozos;
+            strcpy(nuevo.nombre, historica.nombreMozo);
+            nuevo.totalComision = 0.0f;
+ 
+            // Clave inicial: el numero de mozo como texto, ya codificado.
+            numeroATexto(nuevo.idMozo, nuevo.password);
+            codificarClave(nuevo.password);
+ 
+            listaMozos = agregarAlFinal(listaMozos, nuevo);
+            nodoMozo = buscarMozoPorNombre(listaMozos, historica.nombreMozo);
+        }
+ 
+        nodoMozo->info.totalComision += historica.comision;
+    }
+    fclose(archivoHistorico);
+ 
+    if (listaMozos == NULL) {
+        printf("No hay comandas historicas para procesar.\n");
+        return 0;
+    }
+ 
+    // Recorro la lista y la escribo en mozos.dat
+    FILE* archivoMozos = fopen("mozos.dat", "wb");
+    if (archivoMozos == NULL) {
+        printf("Error: no se pudo crear mozos.dat.\n");
+        return 1;
+    }
+ 
+    Nodo* actual = listaMozos;
+    while (actual != NULL) {
+        fwrite(&actual->info, sizeof(Mozo), 1, archivoMozos);
+        actual = actual->sig;
+    }
+    fclose(archivoMozos);
+ 
+    // Libero la memoria de la lista
+    while (listaMozos != NULL) {
+        Nodo* temp = listaMozos;
+        listaMozos = listaMozos->sig;
+        delete temp;
+    }
+ 
+    printf("Normalizacion terminada. Mozos registrados: %d.\n", cantidadMozos);
+    return 0;
 }
