@@ -68,4 +68,5 @@ Testing/
 .cache/
 
 
-.dat
+*.dat
+*.exe
