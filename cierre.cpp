@@ -39,7 +39,7 @@ for (int i=0; i<cantidaddias; i++){
 
  sprintf(nombrearchivo, "comandas_%s.txt", fecha);
  diarios[i] = fopen(nombrearchivo, "rb");
- if (!diarios[i]== NULL) {
+ if (diarios[i]== NULL) {
      cout << "Error: No se pudo abrir el archivo " << nombrearchivo << "." << endl;
      for (int j=0; j<i; j++) {
          fclose(diarios[j]);
