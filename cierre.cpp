@@ -42,7 +42,7 @@ for (int i=0;i<cantidaddias;i++){
 }
 //abre las plantillas
 for (int i=0; i<cantidaddias; i++){
- cout<< "fecha del dia "<< i+1<<" (dd/mm/aaaa): ";
+ cout<< "fecha del dia "<< i+1<<" (dd-mm-aaaa): ";
  cin>> fecha;
 
  sprintf(nombrearchivo, "comandas_%s.txt", fecha);
