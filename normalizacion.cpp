@@ -308,7 +308,7 @@ void MigrarComandas() {
 int main() {
     FILE* archivoHistorico = fopen("comandas_historicas.dat", "rb");
     if (archivoHistorico == NULL) {
-        printf("Error: no se pudo abrir comandas_historicas.dat.\n");
+cout << "Error: no se pudo abrir comandas_historicas.dat." << endl;
         return 1;
     }
 
@@ -340,14 +340,14 @@ int main() {
     fclose(archivoHistorico);
 
     if (listaMozos == NULL) {
-        printf("No hay comandas historicas para procesar.\n");
+cout << "No hay comandas historicas para procesar." << endl;
         return 0;
     }
 
     // Recorro la lista y la escribo en mozos.dat
     FILE* archivoMozos = fopen("mozos.dat", "wb");
     if (archivoMozos == NULL) {
-        printf("Error: no se pudo crear mozos.dat.\n");
+      cout << "Error: no se pudo crear mozos.dat." << endl;  
         return 1;
     }
 
@@ -365,6 +365,6 @@ int main() {
         delete temp;
     }
     MigrarComandas();
-    printf("Normalizacion terminada. Mozos registrados: %d.\n", cantidadMozos);
+    cout << "Normalizacion terminada. Mozos registrados: " << cantidadMozos << "." << endl;
     return 0;
 }
