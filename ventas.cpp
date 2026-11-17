@@ -3,54 +3,70 @@
 #include <cstring>
 using namespace std;
 
-
-
 struct Mozo{
     int idMozo;
     char nombre[50];
     char password[20];
-    float totalComision
+    float totalComision; 
 };
-
-
 
 struct Producto{
     int codigo;
     char descripcion[50];
     float precio;
-    int stockActual
+    int stockActual; 
 };
-
-
 
 struct Comanda {
     int idMozo;
     int codigoProducto;
     int cantidad;
-    float comision
+    float comision; 
 };
 
+long busquedaBinariaProducto(const char* nombre, int codigo, Producto &p) {
 
+    FILE* f = fopen(nombre, "rb");
+    if (f == NULL) return -1;
+    fseek(f, 0, SEEK_END);
+    long n = ftell(f) / sizeof(Producto); 
+    long pri = 0, ult = n - 1, pos = -1;
+
+    while (pri <= ult && pos == -1) {
+        long med = (pri + ult) / 2;
+        fseek(f, med * sizeof(Producto), SEEK_SET);
+        fread(&p, sizeof(Producto), 1, f);
+        if (p.codigo == codigo) pos = med;
+        else if (codigo > p.codigo) pri = med + 1;
+        else ult = med - 1;
+    }
+
+    fclose(f);
+    return pos;
+}
 
 void encriptarClave(char clave[]){
     int contador = 0;
-    while (clave[contador] != 0){
+
+    while (clave[contador] != '\0'){
         clave[contador] = clave[contador] + 5;
         contador++;
     }
+
 }
-
-
 
 bool revisarMozo(int idIngresado, char claveIngresada[]) {
     FILE* archivoMozos;
     archivoMozos = fopen("mozos.dat", "rb");
+
     if (archivoMozos == NULL) {
         cout << "Error: No se pudo abrir el archivo de mozos." << endl;
         return false;
     }
+
     Mozo unMozo;
     bool loEncontre = false;
+
     while (fread(&unMozo, sizeof(Mozo), 1, archivoMozos) == 1) {
         if (unMozo.idMozo == idIngresado) {
             if (strcmp(unMozo.password, claveIngresada) == 0) {
@@ -58,45 +74,55 @@ bool revisarMozo(int idIngresado, char claveIngresada[]) {
             }
         }
     }
+
     fclose(archivoMozos);
     return loEncontre;
 }
 
-
-
-
 bool procesarVenta(int codigoProd, int cantidadPedida, float &comisionCalculada) {
-    FILE* archivoInventario;
-    archivoInventario = fopen("inventario.dat", "r+b"); 
-    if (archivoInventario == NULL) {
-        cout << "Error: No se encontro el inventario." << endl;
-        return false;
-    }
-    Producto unProducto;
+    Producto unProducto; 
     bool sePudoVender = false;
-    while (fread(&unProducto, sizeof(Producto), 1, archivoInventario) == 1) {
-        if (unProducto.codigo == codigoProd) {
-            if (unProducto.stockActual >= cantidadPedida) {
-                unProducto.stockActual = unProducto.stockActual - cantidadPedida;
-                float totalPlata = unProducto.precio * cantidadPedida;
-                comisionCalculada = totalPlata * 0.10f;
-                fseek(archivoInventario, -sizeof(Producto), SEEK_CUR);
-                fwrite(&unProducto, sizeof(Producto), 1, archivoInventario);
 
+    long pos = busquedaBinariaProducto("inventario.dat", codigoProd, unProducto);
+    
+    if (pos != -1) {
+        
+        if (unProducto.stockActual >= cantidadPedida) {
+            
+            unProducto.stockActual = unProducto.stockActual - cantidadPedida;
+            float totalPlata = unProducto.precio * cantidadPedida;
+            comisionCalculada = totalPlata * 0.10f;
+            
+            FILE* archivoInventario = fopen("inventario.dat", "r+b"); 
+            
+            if (archivoInventario != NULL) {
+
+                fseek(archivoInventario, pos * sizeof(Producto), SEEK_SET);
+                
+                fwrite(&unProducto, sizeof(Producto), 1, archivoInventario);
+                
+                fclose(archivoInventario);
                 sePudoVender = true;
+                
+            } else {
+                cout << "Error: No se pudo abrir el inventario para actualizar." << endl;
             }
+            
+        } else {
+            cout << "No hay stock suficiente. Stock actual: " << unProducto.stockActual << endl;
         }
+        
+    } else {
+        cout << "Error: El codigo de producto " << codigoProd << " no existe." << endl;
     }
 
-    fclose(archivoInventario);
     return sePudoVender;
 }
-
-
 
 void ordenarVentas(char nombreDelArchivo[]) {
     FILE* archivoVentas;
     archivoVentas = fopen(nombreDelArchivo, "rb");
+    
     if (archivoVentas == NULL) {
         return;
     }
@@ -104,6 +130,7 @@ void ordenarVentas(char nombreDelArchivo[]) {
     int pesoTotal = ftell(archivoVentas);
     int cantidadDeVentas = pesoTotal / sizeof(Comanda);
     rewind(archivoVentas);
+    
     if (cantidadDeVentas > 1) {
         Comanda* arregloDinamico;
         arregloDinamico = new Comanda[cantidadDeVentas];
@@ -134,13 +161,17 @@ int main() {
     char fechaDelDia[11];
     char nombreArchivoDia[50];
     int opcionParaSeguir = 1;
+    
     cout << "Hola! Ingrese la fecha de hoy (DD-MM-AAAA): ";
     cin >> fechaDelDia;
+    
     sprintf(nombreArchivoDia, "comandas_%s.dat", fechaDelDia);
     FILE* archivoInicial = fopen(nombreArchivoDia, "ab");
+    
     if (archivoInicial != NULL) {
         fclose(archivoInicial);
     }
+    
     while (opcionParaSeguir == 1) {
         int idIngresado;
         char claveIngresada[20];
@@ -150,6 +181,7 @@ int main() {
         cout << "Ingrese la clave: ";
         cin >> claveIngresada;
         encriptarClave(claveIngresada);
+    
         if (revisarMozo(idIngresado, claveIngresada) == true) {
             cout << "Mozo correcto!" << endl;
             int codigoProducto;
@@ -159,6 +191,7 @@ int main() {
             cout << "Ingrese la cantidad: ";
             cin >> cantidadProducto;
             float comisionParaElMozo = 0;
+    
             if (procesarVenta(codigoProducto, cantidadProducto, comisionParaElMozo) == true) {
                 Comanda nuevaComanda;
                 nuevaComanda.idMozo = idIngresado;
@@ -170,6 +203,7 @@ int main() {
                 fclose(archivoDelDia);
 
                 cout << "Venta guardada. Comision para el mozo: $" << comisionParaElMozo << endl;
+    
             } else {
                 cout << "No se pudo hacer la venta (falta stock o no existe el codigo)." << endl;
             }
