@@ -5,9 +5,9 @@
 **Comisión:** K1092
 
 **Participantes:**
-Emerson @Emerson-cd ----> NORMALIZACION
-Roman @Rpenaascanio ----> VENTAS
-Miguel @mikisauro4-png ----> CIERRE
-Rodrigo @rodri364 ----> NORMALIZACION
-Juan @JUANCETT-creator ----> RESUMEN
+##Emerson @Emerson-cd ----> NORMALIZACION
+##Roman @Rpenaascanio ----> VENTAS
+##Miguel @mikisauro4-png ----> CIERRE
+##Rodrigo @rodri364 ----> NORMALIZACION
+##Juan @JUANCETT-creator ----> RESUMEN
 
