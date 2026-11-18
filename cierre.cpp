@@ -45,7 +45,7 @@ for (int i=0; i<cantidaddias; i++){
  cout<< "fecha del dia "<< i+1<<" (dd-mm-aaaa): ";
  cin>> fecha;
 
- sprintf(nombrearchivo, "comandas_%s.txt", fecha);
+ sprintf(nombrearchivo, "comandas_%s.dat", fecha);
  diarios[i] = fopen(nombrearchivo, "rb");
  if (!diarios[i]== NULL) {
      cout << "AVISO:NO EXISTE LA PLANTILLA " << nombrearchivo << ". SE CONTINUARA CON LOS DEMAS DIAS."<< endl;
@@ -68,7 +68,7 @@ for (int i=0; i<cantidaddias; i++){
     cout<< "aviso: la plantilla "<< nombrearchivo<< " esta vacia."<<endl;
  }  
 } 
-sprintf(nombresemanal, "comandas_semana_s%d_mes_%02d.txt", semana, mes);
+sprintf(nombresemanal, "comandas_semana_s%d_mes_%02d.dat", semana, mes);
 semanal = fopen(nombresemanal, "wb");
 if (!semanal) {
     cout << "Error: No se pudo crear el archivo semanal." << endl;
